@@ -15,6 +15,7 @@ import { Banner } from '../../blocks/Banner/config'
 import { Code } from '../../blocks/Code/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
+import { notifyBrazeOfNewRecipe } from './hooks/notifyBrazeOfNewRecipe'
 import { populateAuthors } from './hooks/populateAuthors'
 import { revalidateDelete, revalidateRecipe } from './hooks/revalidateRecipe'
 
@@ -296,7 +297,7 @@ export const Recipes: CollectionConfig<'recipes'> = {
     slugField({ localized: true }),
   ],
   hooks: {
-    afterChange: [revalidateRecipe],
+    afterChange: [revalidateRecipe, notifyBrazeOfNewRecipe],
     afterRead: [populateAuthors],
     afterDelete: [revalidateDelete],
   },
