@@ -6,15 +6,15 @@ import { home } from './home'
 import { image1 } from './image-1'
 import { image2 } from './image-2'
 import { imageHero1 } from './image-hero-1'
-import { post1 } from './post-1'
-import { post2 } from './post-2'
-import { post3 } from './post-3'
+import { recipe1 } from './recipe-1'
+import { recipe2 } from './recipe-2'
+import { recipe3 } from './recipe-3'
 
 const collections: CollectionSlug[] = [
   'categories',
   'media',
   'pages',
-  'posts',
+  'recipes',
   'forms',
   'form-submissions',
   'search',
@@ -105,6 +105,7 @@ export const seed = async ({
         name: 'Demo Author',
         email: 'demo-author@example.com',
         password: 'password',
+        roles: ['admin'],
       },
     }),
     payload.create({
@@ -138,57 +139,57 @@ export const seed = async ({
     ),
   ])
 
-  payload.logger.info(`— Seeding posts...`)
+  payload.logger.info(`— Seeding recipes...`)
 
-  // Do not create posts with `Promise.all` because we want the posts to be created in order
+  // Do not create recipes with `Promise.all` because we want the recipes to be created in order
   // This way we can sort them by `createdAt` or `publishedAt` and they will be in the expected order
-  const post1Doc = await payload.create({
-    collection: 'posts',
+  const recipe1Doc = await payload.create({
+    collection: 'recipes',
     depth: 0,
     context: {
       disableRevalidate: true,
     },
-    data: post1({ heroImage: image1Doc, blockImage: image2Doc, author: demoAuthor }),
+    data: recipe1({ heroImage: image1Doc, blockImage: image2Doc, author: demoAuthor }),
   })
 
-  const post2Doc = await payload.create({
-    collection: 'posts',
+  const recipe2Doc = await payload.create({
+    collection: 'recipes',
     depth: 0,
     context: {
       disableRevalidate: true,
     },
-    data: post2({ heroImage: image2Doc, blockImage: image3Doc, author: demoAuthor }),
+    data: recipe2({ heroImage: image2Doc, blockImage: image3Doc, author: demoAuthor }),
   })
 
-  const post3Doc = await payload.create({
-    collection: 'posts',
+  const recipe3Doc = await payload.create({
+    collection: 'recipes',
     depth: 0,
     context: {
       disableRevalidate: true,
     },
-    data: post3({ heroImage: image3Doc, blockImage: image1Doc, author: demoAuthor }),
+    data: recipe3({ heroImage: image3Doc, blockImage: image1Doc, author: demoAuthor }),
   })
 
-  // update each post with related posts
+  // update each recipe with related recipes
   await payload.update({
-    id: post1Doc.id,
-    collection: 'posts',
+    id: recipe1Doc.id,
+    collection: 'recipes',
     data: {
-      relatedPosts: [post2Doc.id, post3Doc.id],
+      relatedRecipes: [recipe2Doc.id, recipe3Doc.id],
     },
   })
   await payload.update({
-    id: post2Doc.id,
-    collection: 'posts',
+    id: recipe2Doc.id,
+    collection: 'recipes',
     data: {
-      relatedPosts: [post1Doc.id, post3Doc.id],
+      relatedRecipes: [recipe1Doc.id, recipe3Doc.id],
     },
   })
   await payload.update({
-    id: post3Doc.id,
-    collection: 'posts',
+    id: recipe3Doc.id,
+    collection: 'recipes',
     data: {
-      relatedPosts: [post1Doc.id, post2Doc.id],
+      relatedRecipes: [recipe1Doc.id, recipe2Doc.id],
     },
   })
 
@@ -225,8 +226,8 @@ export const seed = async ({
           {
             link: {
               type: 'custom',
-              label: 'Posts',
-              url: '/posts',
+              label: 'Recipes',
+              url: '/recipes',
             },
           },
           {
@@ -257,6 +258,70 @@ export const seed = async ({
             link: {
               type: 'custom',
               label: 'Source Code',
+              newTab: true,
+              url: 'https://github.com/payloadcms/payload/tree/3.x/templates/website',
+            },
+          },
+          {
+            link: {
+              type: 'custom',
+              label: 'Payload',
+              newTab: true,
+              url: 'https://payloadcms.com/',
+            },
+          },
+        ],
+      },
+    }),
+  ])
+
+  // Seed a Spanish translation for the site chrome as a working example of
+  // localization — page and recipe content stays English-only and relies on
+  // Payload's `fallback: true` until translated by an editor.
+  payload.logger.info(`— Seeding Spanish nav translations...`)
+
+  await Promise.all([
+    payload.updateGlobal({
+      slug: 'header',
+      locale: 'es',
+      data: {
+        navItems: [
+          {
+            link: {
+              type: 'custom',
+              label: 'Recetas',
+              url: '/recipes',
+            },
+          },
+          {
+            link: {
+              type: 'reference',
+              label: 'Contacto',
+              reference: {
+                relationTo: 'pages',
+                value: contactPage.id,
+              },
+            },
+          },
+        ],
+      },
+    }),
+    payload.updateGlobal({
+      slug: 'footer',
+      locale: 'es',
+      data: {
+        navItems: [
+          {
+            link: {
+              type: 'custom',
+              label: 'Admin',
+              url: '/admin',
+            },
+          },
+          {
+            link: {
+              type: 'custom',
+              label: 'Código fuente',
               newTab: true,
               url: 'https://github.com/payloadcms/payload/tree/3.x/templates/website',
             },

@@ -1,24 +1,32 @@
 import type React from 'react'
-import type { Page, Post } from '@/payload-types'
+import type { Page, Recipe } from '@/payload-types'
 
 import { getCachedDocument } from '@/utilities/getDocument'
 import { getCachedRedirects } from '@/utilities/getRedirects'
 import { notFound, redirect } from 'next/navigation'
+import { defaultLocale, localizePath, type Locale } from '@/utilities/i18n'
 
 interface Props {
   disableNotFound?: boolean
+  locale: Locale
   url: string
 }
 
 /* This component helps us with SSR based dynamic redirects */
-export const PayloadRedirects: React.FC<Props> = async ({ disableNotFound, url }) => {
+export const PayloadRedirects: React.FC<Props> = async ({ disableNotFound, locale, url }) => {
   const redirects = await getCachedRedirects()()
 
-  const redirectItem = redirects.find((redirect) => redirect.from === url)
+  // The `redirects` collection is not locale-aware (v1 limitation): `from`
+  // values are stored unprefixed, so match against the unprefixed path and
+  // re-apply the current locale's prefix to whatever we redirect to.
+  const unprefixedUrl =
+    locale === defaultLocale ? url : (url.replace(new RegExp(`^/${locale}`), '') || '/')
+
+  const redirectItem = redirects.find((redirect) => redirect.from === unprefixedUrl)
 
   if (redirectItem) {
     if (redirectItem.to?.url) {
-      redirect(redirectItem.to.url)
+      redirect(localizePath(locale, redirectItem.to.url))
     }
 
     let redirectUrl: string
@@ -27,7 +35,7 @@ export const PayloadRedirects: React.FC<Props> = async ({ disableNotFound, url }
       const collection = redirectItem.to?.reference?.relationTo
       const id = redirectItem.to?.reference?.value
 
-      const document = (await getCachedDocument(collection, id)()) as Page | Post
+      const document = (await getCachedDocument(collection, id, locale)()) as Page | Recipe
       redirectUrl = `${redirectItem.to?.reference?.relationTo !== 'pages' ? `/${redirectItem.to?.reference?.relationTo}` : ''}/${
         document?.slug
       }`
@@ -39,7 +47,7 @@ export const PayloadRedirects: React.FC<Props> = async ({ disableNotFound, url }
       }`
     }
 
-    if (redirectUrl) redirect(redirectUrl)
+    if (redirectUrl) redirect(localizePath(locale, redirectUrl))
   }
 
   if (disableNotFound) return null

@@ -1,3 +1,4 @@
+import { cn } from '@/utilities/ui'
 import React from 'react'
 
 const defaultLabels = {
@@ -6,9 +7,9 @@ const defaultLabels = {
 }
 
 const defaultCollectionLabels = {
-  posts: {
-    plural: 'Posts',
-    singular: 'Post',
+  recipes: {
+    plural: 'Recipes',
+    singular: 'Recipe',
   },
 }
 
@@ -45,7 +46,7 @@ export const PageRange: React.FC<{
     {}
 
   return (
-    <div className={[className, 'font-semibold'].filter(Boolean).join(' ')}>
+    <div className={cn('font-mono text-xs font-semibold tracking-[0.09em] text-muted-foreground uppercase', className)}>
       {(typeof totalDocs === 'undefined' || totalDocs === 0) && 'Search produced no results.'}
       {typeof totalDocs !== 'undefined' &&
         totalDocs > 0 &&

@@ -9,6 +9,38 @@
     }
   }
 
+  &__counts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: base(0.5);
+    list-style: none;
+    margin: base(0.75) 0;
+    padding: 0;
+  }
+
+  &__count {
+    align-items: center;
+    background: var(--theme-elevation-50);
+    border: 1px solid var(--theme-elevation-100);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    min-width: 90px;
+    padding: base(0.4) base(0.6);
+  }
+
+  &__count-number {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  &__count-label {
+    color: var(--theme-elevation-500);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+
   &__instructions {
     list-style: decimal;
     margin-bottom: base(0.5);
